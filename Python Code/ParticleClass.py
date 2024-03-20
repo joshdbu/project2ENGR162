@@ -11,9 +11,9 @@ mewFluid = 1
 class Particles:
     def __init__(self, intX, intY, intXVel, intYVel):
         # constants are 1 and things that need calculated are 0
-        self.ppart = 1
+        self.ppart = 1620 # in units of kg / cm^3
         self.partCharge = 1
-        self.dpart = 1
+        self.dpart = 2.5 * 10 ** (-6) # could add some random noise of +- 5% to this
         
         self.Cd = 0
         self.vapt = 0 # velocity apperant
