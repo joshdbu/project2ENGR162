@@ -3,9 +3,10 @@ g = 9.81
 
 
 class Particles:
-    def __init__(self, a, v, intX, intY, intXVel, intYVel):
+    def __init__(self, a, v, intX, intY, intXVel, intYVel, dt):
         # constants are 1 and things that need calculated are 0
         self.ppart = 1
+        self.partCharge = 1
         self.dpart = 1
         self.pfluid = 1
         self.avert = a
@@ -21,8 +22,13 @@ class Particles:
         self.pMass = (4/3) * pi * (self.dpart / 2)^2 * self.ppart
         self.xPos, self.yPos = intX, intY
         self.xVel, self.yVel = intXVel, intYVel
+        self.timeStep = dt
+        self.plateCharge = 1
+        self.fg = self.gravF()
+        self.fb = self.bouyF()
 
-     def euler(self):
+
+    def euler(self):
         time = 0
         timeList = [0]
         xList = [self.xPos]
@@ -37,14 +43,23 @@ class Particles:
             timeList.append(time)
             xList.append(self.xPos)
             yList.append(self.yPos)
-        
+
     def updatePos(self, fi, fk):
         oldXVel, oldYVel = self.xVel, self.yVel
 
-        deltaX
-        deltaX = 
+        self.xVel = (fi * self.timeStep) / self.pMass 
+        self.yVel = (fk * self.timeStep) / self.pMass
 
+        avgXVel = (oldXVel + self.xVel) / 2
+        avgYVel = (oldYVel + self.yVel) / 2
+        
+        deltaXPos = avgXVel * self.timeStep + 0.5 * (fi / self.pMass) * self.timeStep ^ 2
+        deltaYPos = avgYVel * self.timeStep + 0.5 * (fi / self.pMass) * self.timeStep ^ 2
 
+        self.xPos += deltaXPos
+        self.yPos += deltaYPos
+
+    # def updateDvert
     
     def calcCd(self):
         Re = (self.pfluid * self.dpart * abs(self.vapt))/ self.mewFluid
@@ -62,5 +77,8 @@ class Particles:
     def dragF(self):
         df = (1/2) * self.pfluid * self.calcCd() * (pi / 4) * self.dpart ^ 2 * self.vapt ^ 2
         return df
+    
+    def plateF(self):
+        pf = (self.plateCharge * self.partCharge) / (2 * pi * self.E0)
 
     
