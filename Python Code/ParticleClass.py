@@ -22,7 +22,21 @@ class Particles:
         self.xPos, self.yPos = intX, intY
         self.xVel, self.yVel = intXVel, intYVel
 
-
+     def euler(self):
+        time = 0
+        timeList = [0]
+        xList = [self.xPos]
+        yList = [self.yPos]
+        
+        while self.yPos > 0 and self.xPos < self.H:
+            fd = self.dragF()
+            fe = self.field()
+            
+            self.xPos, self.yPos = self.updatePos(fd, fe)
+            time = time + self.timeStep
+            timeList.append(time)
+            xList.append(self.xPos)
+            yList.append(self.yPos)
         
     def updatePos(self, fi, fk):
         oldXVel, oldYVel = self.xVel, self.yVel
