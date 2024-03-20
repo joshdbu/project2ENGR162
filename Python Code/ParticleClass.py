@@ -3,7 +3,7 @@ g = 9.81
 
 
 class Particles:
-    def __init__(self, a, v):
+    def __init__(self, a, v, intX, intY, intXVel, intYVel):
         # constants are 1 and things that need calculated are 0
         self.ppart = 1
         self.dpart = 1
@@ -16,22 +16,37 @@ class Particles:
         self.q = 0
         self.chgDen = 0
         self.E0 = 8.85418 * 10^(-12)
-        self.Dvert = 0 #distance above center of charges
+        self.Dvert = 0 # distance above center of charges
         self.H = 0
+        self.pMass = (4/3) * pi * (self.dpart / 2)^2 * self.ppart
+        self.xPos, self.yPos = intX, intY
+        self.xVel, self.yVel = intXVel, intYVel
+
+
         
+    def updatePos(self, fi, fk):
+        oldXVel, oldYVel = self.xVel, self.yVel
+
+        deltaX
+        deltaX = 
+
+
+    
     def calcCd(self):
         Re = (self.pfluid * self.dpart * abs(self.vapt))/ self.mewFluid
         Cd = 24 / Re
         return Cd
     
     def gravF(self):
-        (pi / 6) * self.ppart * g * (self.dpart ^ 3)
-    
+        fg = (pi / 6) * self.ppart * g * (self.dpart ^ 3)
+        return fg
+
     def bouyF(self):
-        (pi / 6) * self.pfluid * g * (self.dpart ^ 3)
+        bf = (pi / 6) * self.pfluid * g * (self.dpart ^ 3)
+        return bf
 
     def dragF(self):
-        (1/2) * self.pfluid * self.calcCd() * (pi / 4) * self.dpart ^ 2 * self.vapt ^ 2
-    
+        df = (1/2) * self.pfluid * self.calcCd() * (pi / 4) * self.dpart ^ 2 * self.vapt ^ 2
+        return df
 
     
