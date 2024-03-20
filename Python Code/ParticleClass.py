@@ -1,28 +1,30 @@
 from math import pi
-g = 9.81
+
+timeStep = input("Enter desired timestep in seconds: ")
+g = 9.81 # gravity
+E0 = 8.85418 * 10 **(-12) # epsilon naught
+pfluid = 1 # density fluid
+filterLength = 0 # filter length
+mewFluid = 1
 
 
 class Particles:
-    def __init__(self, a, v, intX, intY, intXVel, intYVel, dt):
+    def __init__(self, intX, intY, intXVel, intYVel):
         # constants are 1 and things that need calculated are 0
         self.ppart = 1
         self.partCharge = 1
         self.dpart = 1
-        self.pfluid = 1
-        self.avert = a
-        self.vvert = v
+        
         self.Cd = 0
-        self.vapt = 0
-        self.mewFluid = 1
+        self.vapt = 0 # velocity apperant
+        
         self.q = 0
         self.chgDen = 0
-        self.E0 = 8.85418 * 10^(-12)
         self.Dvert = 0 # distance above center of charges
-        self.H = 0
-        self.pMass = (4/3) * pi * (self.dpart / 2)^2 * self.ppart
+        
+        self.pMass = (4/3) * pi * (self.dpart / 2)**2 * self.ppart
         self.xPos, self.yPos = intX, intY
         self.xVel, self.yVel = intXVel, intYVel
-        self.timeStep = dt
         self.plateCharge = 1
         self.fg = self.gravF()
         self.fb = self.bouyF()
@@ -34,12 +36,12 @@ class Particles:
         xList = [self.xPos]
         yList = [self.yPos]
         
-        while self.yPos > 0 and self.xPos < self.H:
+        while self.yPos > 0 and self.xPos < filterLength:
             fd = self.dragF()
-            fe = self.field()
+            fe = self.field() # note this is other field
             
             self.xPos, self.yPos = self.updatePos(fd, fe)
-            time = time + self.timeStep
+            time = time + timeStep
             timeList.append(time)
             xList.append(self.xPos)
             yList.append(self.yPos)
@@ -47,14 +49,14 @@ class Particles:
     def updatePos(self, fi, fk):
         oldXVel, oldYVel = self.xVel, self.yVel
 
-        self.xVel = (fi * self.timeStep) / self.pMass 
-        self.yVel = (fk * self.timeStep) / self.pMass
+        self.xVel = (fi * timeStep) / self.pMass 
+        self.yVel = (fk * timeStep) / self.pMass
 
         avgXVel = (oldXVel + self.xVel) / 2
         avgYVel = (oldYVel + self.yVel) / 2
         
-        deltaXPos = avgXVel * self.timeStep + 0.5 * (fi / self.pMass) * self.timeStep ^ 2
-        deltaYPos = avgYVel * self.timeStep + 0.5 * (fi / self.pMass) * self.timeStep ^ 2
+        deltaXPos = avgXVel * timeStep + 0.5 * (fi / self.pMass) * timeStep ** 2
+        deltaYPos = avgYVel * timeStep + 0.5 * (fi / self.pMass) * timeStep ** 2
 
         self.xPos += deltaXPos
         self.yPos += deltaYPos
@@ -62,20 +64,20 @@ class Particles:
     # def updateDvert
     
     def calcCd(self):
-        Re = (self.pfluid * self.dpart * abs(self.vapt))/ self.mewFluid
+        Re = (pfluid * self.dpart * abs(self.vapt))/ mewFluid
         Cd = 24 / Re
         return Cd
     
     def gravF(self):
-        fg = (pi / 6) * self.ppart * g * (self.dpart ^ 3)
+        fg = (pi / 6) * self.ppart * g * (self.dpart ** 3)
         return fg
 
     def bouyF(self):
-        bf = (pi / 6) * self.pfluid * g * (self.dpart ^ 3)
+        bf = (pi / 6) * pfluid * g * (self.dpart ** 3)
         return bf
 
     def dragF(self):
-        df = (1/2) * self.pfluid * self.calcCd() * (pi / 4) * self.dpart ^ 2 * self.vapt ^ 2
+        df = (1/2) * pfluid * self.calcCd() * (pi / 4) * self.dpart ** 2 * self.vapt ** 2
         return df
     
     def plateF(self):
