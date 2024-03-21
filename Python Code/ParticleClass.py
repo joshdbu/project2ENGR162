@@ -1,8 +1,9 @@
-from math import pi
+from math import pi, atan, sqrt, cos, sin
+from random import choice
 from FilterClass import horizontalFilter
 
 # timeStep = float(input("Enter desired timestep in seconds: "))
-timeStep = 0.01
+timeStep = 0.001
 g = 9.81 # gravity
 E0 = 8.85418 * 10 ** (-12) # epsilon naught
 eV = 1.6021766 * 10 ** (-19) # electron volt- in columbs
@@ -13,7 +14,7 @@ class SmogParticles:
     def __init__(self, filterDim, intX, intY, intXVel, intYVel):
         # constants are 1 and things that need calculated are 0
         self.ppart = 1620 # density in units of kg / cm^3
-        self.partCharge = 75 * eV # charge in factor of 1 electron volt
+        self.partCharge = choice([-1, 1]) * 75 * eV # charge in factor of 1 electron volt
         self.dpart = 2.5 * 10 ** (-6) # could add some random noise of +- 5% to this
         
         self.filterDim = filterDim
@@ -25,7 +26,10 @@ class SmogParticles:
         self.pMass = (4/3) * pi * (self.dpart / 2)**2 * self.ppart
         self.xPos, self.yPos = intX, intY
         self.xVel, self.yVel = intXVel, intYVel
-        self.plateCharge = 0.01 # charge of bottom pl
+        # self.plateCharge = 1 # charge of bottom pl
+        self.plateCharge = 0.005 # charge of bottom pl
+        # self.plateCharge = 1.38 * 10 ** (-12) # charge of bottom pl
+
         self.fg = self.gravF()
         self.fb = self.bouyF()
         self.fp = self.plateF()
@@ -36,7 +40,18 @@ class SmogParticles:
         timeList = [0]
         xList = [self.xPos]
         yList = [self.yPos]
-        
+        horizontalFilter.updateChargeDen(filter)
+
+        horizontalFilter.partIn(filter, self.partCharge)
+
+        while self.xPos < 0:
+            
+            self.updatePos(0, 0)
+            time += timeStep
+            timeList.append(time)
+            xList.append(self.xPos)
+            yList.append(self.yPos)
+
         while self.yPos > 0 and self.yPos < self.filterDim[1] and self.xPos < self.filterDim[0]:
             # print("time at start of loop was", time)
             # print("y pos is", self.yPos, "x pos is", self.xPos)
@@ -48,8 +63,20 @@ class SmogParticles:
             timeList.append(time)
             xList.append(self.xPos)
             yList.append(self.yPos)
+
+        if self.xPos > self.filterDim[0]:
+            while self.xPos < self.filterDim[0] + 0.5:
+
+                self.updatePos(0, 0)
+                time = time + timeStep
+                timeList.append(time)
+                xList.append(self.xPos)
+                yList.append(self.yPos)
+
+            horizontalFilter.partOut(filter, self.partCharge)
+
         
-        print("broke out of loop! y pos is", self.yPos, "x pos is", self.xPos)
+        # print("broke out of loop! y pos is", self.yPos, "x pos is", self.xPos)
 
         return xList, yList, timeList
 
@@ -78,7 +105,10 @@ class SmogParticles:
     
     def calcCd(self, velApt):
         Re = (pfluid * self.dpart * abs(velApt))/ mewFluid
-        Cd = 24 / Re
+        if Re != 0:
+            Cd = 24 / Re
+        else:
+            Cd = 0
         return Cd
     
     def gravF(self):
@@ -89,6 +119,16 @@ class SmogParticles:
         bf = (pi / 6) * pfluid * g * (self.dpart ** 3)
         return bf
 
+    # def dragF(self, xVelApt, yVelApt):
+    #     mag = sqrt(xVelApt ** 2 + yVelApt ** 2)
+    #     theta = atan(yVelApt / xVelApt)
+
+    #     df = (1/2) * pfluid * self.yCd * (pi / 4) * self.dpart ** 2 * mag ** 2
+    #     dragX = df * cos(theta)
+    #     dragY = df * sin(theta)
+        
+    #     return dragX, dragY
+    
     def dragF(self, velApt):
         df = (1/2) * pfluid * self.yCd * (pi / 4) * self.dpart ** 2 * velApt ** 2
         return df

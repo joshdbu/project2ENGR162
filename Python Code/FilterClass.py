@@ -7,20 +7,28 @@ class horizontalFilter:
 
         self.volume = self.len * self.height * self.width
 
+        self.numCharges = 0
+        self.numChargesEscape = 0
         self.totalCharge = 0
         self.volChargeDen = 0
+
     def partIn(self, charge):
         self.totalCharge += charge
+        self.numCharges += 1
 
     def partOut(self, charge):
         self.totalCharge -= charge
+        self.numChargesEscape += 1
 
-    def updateChargeDen(self):
+    def updateChargeDen(self):        
         self.volChargeDen = self.totalCharge / self.volume
 
     def getVCD(self):
         
         return self.volChargeDen
+
+    def calcHowGood(self):
+        return 100 * (1 - self.numChargesEscape / self.numCharges)
 
     def getHeight(self):
         # obselete function?
