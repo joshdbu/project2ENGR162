@@ -1,5 +1,4 @@
 import math as m
-from numpy import sign
 import random
 
 g = 9.81
@@ -7,16 +6,18 @@ timeStep = 0.001 #input("Enter desired timestep in seconds: ")
 
 class AirParticles:
     
-    def __init__(self, intX, intY, intXVel, intYVel):
+    def __init__(self, intX, intY, intXVel, intYVel, windVel):
         self.ppart = 1.229
         self.dpart = 3 * 10 ** (-10)
         self.pfluid = 1.229
         self.mewFluid = 18.18 * 10 ** (-6)
         self.Cd = 0.47
+        self.windVel = windVel
         self.pMass = (4/3) * m.pi * ((self.dpart / 2) ** 2) * self.ppart
         self.xPos, self.yPos = intX, intY
         self.xVel, self.yVel = intXVel, intYVel
-        self.vapt = m.sqrt(self.xVel ** 2 + self.yVel ** 2)
+        self.xVapt = self.xVel - self.windVel
+        self.vapt = m.sqrt(self.xVapt ** 2 + self.yVel ** 2)
         
     def euler(self):
         time = 0
@@ -24,11 +25,10 @@ class AirParticles:
         xList = [self.xPos]
         yList = [self.yPos]
         
-        angle = m.atan(self.yVel / self.xVel)
-        # print(angle)
-        randy = random.uniform(0.8, 1.2)
+        randy = random.uniform(0.95, 1.05)
         n = 0
-        while self.vapt > 0.5:
+        while time < 15:
+            angle = m.atan(self.yVel / self.xVel)
             fdmag = self.dragF(self.vapt)
             fdx = -1 * fdmag * m.cos(angle) 
             fdy = -1 * fdmag * m.sin(angle) * randy
@@ -45,17 +45,18 @@ class AirParticles:
         return(timeList, xList, yList)
             
     def updatePos(self, fi, fk):
-        oldXVel, oldYVel = self.xVel, self.yVel
+        oldXVapt, oldYVel = self.xVapt, self.yVel
 
-        self.xVel = ((fi * timeStep) / self.pMass) + oldXVel
+        self.xVapt = ((fi * timeStep) / self.pMass) + oldXVapt
         self.yVel = ((fk * timeStep) / self.pMass) + oldYVel
         #print(f"x: {self.xVel}   y: {self.yVel}")
-        self.vapt = m.sqrt(self.xVel ** 2 + self.yVel ** 2)
+        self.vapt = m.sqrt(self.xVapt ** 2 + self.yVel ** 2)
 
-        avgXVel = (oldXVel + self.xVel) / 2
+        avgXVapt = (oldXVapt + self.xVapt) / 2
+        self.xVel = avgXVapt + self.windVel
         avgYVel = (oldYVel + self.yVel) / 2
         
-        deltaXPos = avgXVel * timeStep + 0.5 * (fi / self.pMass) * timeStep ** 2
+        deltaXPos = self.xVel * timeStep + 0.5 * (fi / self.pMass) * timeStep ** 2
         deltaYPos = avgYVel * timeStep + 0.5 * (fk / self.pMass) * timeStep ** 2
 
         self.xPos += deltaXPos
