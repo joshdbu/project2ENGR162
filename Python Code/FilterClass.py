@@ -21,8 +21,9 @@ class horizontalFilter:
     def getVCD(self):
         
         return self.volChargeDen
-    
+
     def getHeight(self):
+        # obselete function?
         return self.height
     
     def getDimensions(self):

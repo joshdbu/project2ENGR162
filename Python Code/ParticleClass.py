@@ -1,24 +1,22 @@
 from math import pi
 from FilterClass import horizontalFilter
 
-timeStep = float(input("Enter desired timestep in seconds: "))
+# timeStep = float(input("Enter desired timestep in seconds: "))
+timeStep = 0.01
 g = 9.81 # gravity
-E0 = 8.85418 * 10 **(-12) # epsilon naught
-pfluid = 1 # density fluid
-filterLength = 1 # filter length
-mewFluid = 1
-travelWidth = 1 # dimension perpendicular to movement of particle
-
+E0 = 8.85418 * 10 ** (-12) # epsilon naught
+eV = 1.6021766 * 10 ** (-19) # electron volt- in columbs
+pfluid = 1.293 # density fluid (air) in kg per meter^3
+mewFluid = 1.849 * 10 ** (-5)
 
 class SmogParticles:
     def __init__(self, filterDim, intX, intY, intXVel, intYVel):
         # constants are 1 and things that need calculated are 0
-        self.ppart = 1620 # in units of kg / cm^3
-        self.partCharge = 1
+        self.ppart = 1620 # density in units of kg / cm^3
+        self.partCharge = 75 * eV # charge in factor of 1 electron volt
         self.dpart = 2.5 * 10 ** (-6) # could add some random noise of +- 5% to this
         
         self.filterDim = filterDim
-        self.vapt = 0 # velocity apperant
         
         self.Dvert = filterDim[1] / 2 # distance above center of charges
         
@@ -27,7 +25,7 @@ class SmogParticles:
         self.pMass = (4/3) * pi * (self.dpart / 2)**2 * self.ppart
         self.xPos, self.yPos = intX, intY
         self.xVel, self.yVel = intXVel, intYVel
-        self.plateCharge = 1
+        self.plateCharge = 0.01 # charge of bottom pl
         self.fg = self.gravF()
         self.fb = self.bouyF()
         self.fp = self.plateF()
@@ -39,8 +37,9 @@ class SmogParticles:
         xList = [self.xPos]
         yList = [self.yPos]
         
-        while self.yPos > 0 and self.xPos < self.filterDim[0]:
-            print("time at start of loop was", time)
+        while self.yPos > 0 and self.yPos < self.filterDim[1] and self.xPos < self.filterDim[0]:
+            # print("time at start of loop was", time)
+            # print("y pos is", self.yPos, "x pos is", self.xPos)
             fdy = -self.dragF(self.yVel)
             fey = self.otherChargeF(horizontalFilter.getVCD(filter)) # note this is other field
             
@@ -52,11 +51,13 @@ class SmogParticles:
         
         print("broke out of loop! y pos is", self.yPos, "x pos is", self.xPos)
 
+        return xList, yList, timeList
+
     def updatePos(self, fi, fk):
         oldXVel, oldYVel = self.xVel, self.yVel
 
-        self.xVel = (fi * timeStep) / self.pMass 
-        self.yVel = (fk * timeStep) / self.pMass
+        self.xVel = oldXVel + (fi * timeStep) / self.pMass 
+        self.yVel = oldYVel + (fk * timeStep) / self.pMass
 
         self.yCd = self.calcCd(self.yVel) # note: xCd irrelevent as x vel is same as surrounding air
 
