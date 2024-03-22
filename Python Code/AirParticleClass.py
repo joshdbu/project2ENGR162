@@ -1,5 +1,6 @@
 import math as m
 import random
+from numpy import sign
 
 g = 9.81
 timeStep = 0.001 #input("Enter desired timestep in seconds: ")
@@ -24,25 +25,32 @@ class AirParticles:
         timeList = [0]
         xList = [self.xPos]
         yList = [self.yPos]
+        vxList = [self.xVapt]
+        vyList = [self.yVel]
         
         randy = random.uniform(0.95, 1.05)
         n = 0
         while time < 15:
-            angle = m.atan(self.yVel / self.xVel)
+            angle = m.atan(abs(self.yVel / self.xVapt))
             fdmag = self.dragF(self.vapt)
-            fdx = -1 * fdmag * m.cos(angle) 
-            fdy = -1 * fdmag * m.sin(angle) * randy
+            fdx = -1 * sign(self.xVapt) * fdmag * m.cos(angle) 
+            fdy = -1 * sign(self.yVel) * fdmag * m.sin(angle) * randy
             self.updatePos(fdx, fdy)
             time = time + timeStep
             timeList.append(time)
             xList.append(self.xPos)
             yList.append(self.yPos)
-            #print(f"x: {self.xVel}   y: {self.yVel}   mag: {self.vapt}")
+            vxList.append(self.xVapt)
+            vyList.append(self.yVel)
+            #print(f"x: {self.xVapt}   y: {self.yVel}")
+            #print(f"fx: {fdx}  fy: {fdy}")
             #print(self.vapt)
             n += 1
         #print(n)
+        #print(angle)
+        #print(fdy)
         
-        return(timeList, xList, yList)
+        return(timeList, xList, yList, vxList, vyList)
             
     def updatePos(self, fi, fk):
         oldXVapt, oldYVel = self.xVapt, self.yVel
