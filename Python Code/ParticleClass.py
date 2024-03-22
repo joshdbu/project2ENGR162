@@ -1,5 +1,5 @@
 from math import pi, atan, sqrt, cos, sin
-from random import choice
+from random import choice, uniform
 from FilterClass import horizontalFilter
 
 # timeStep = float(input("Enter desired timestep in seconds: "))
@@ -13,8 +13,11 @@ mewFluid = 1.849 * 10 ** (-5)
 class SmogParticles:
     def __init__(self, filterDim, intX, intY, intXVel, intYVel):
         # constants are 1 and things that need calculated are 0
-        self.ppart = 1620 # density in units of kg / cm^3
+        self.ppart = 1620 # density in units of kg / m^3
         self.partCharge = choice([-1, 1]) * 75 * eV # charge in factor of 1 electron volt
+        
+        self.dpart = uniform(0.5 * 10 ** (-6), 10 * 10)
+
         self.dpart = 2.5 * 10 ** (-6) # could add some random noise of +- 5% to this
         
         self.filterDim = filterDim
@@ -27,7 +30,7 @@ class SmogParticles:
         self.xPos, self.yPos = intX, intY
         self.xVel, self.yVel = intXVel, intYVel
         # self.plateCharge = 1 # charge of bottom pl
-        self.plateCharge = 0.005 # charge of bottom pl
+        self.plateChargeDen = 0.005 # charge of bottom pl in columbs per m^2
         # self.plateCharge = 1.38 * 10 ** (-12) # charge of bottom pl
 
         self.fg = self.gravF()
@@ -134,7 +137,7 @@ class SmogParticles:
         return df
     
     def plateF(self):
-        pf = (self.plateCharge * self.partCharge) / (2 * pi * E0)
+        pf = (self.partCharge * self.plateChargeDen) / (2 * pi * E0)
         return pf
 
     def otherChargeF(self, VCD):
