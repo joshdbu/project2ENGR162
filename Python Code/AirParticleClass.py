@@ -8,10 +8,10 @@ timeStep = 0.001 #input("Enter desired timestep in seconds: ")
 class AirParticles:
     
     def __init__(self, intX, intY, intXVel, intYVel, windVel):
-        self.ppart = 1.229
+        self.ppart = 1.293
         self.dpart = 3 * 10 ** (-10)
-        self.pfluid = 1.229
-        self.mewFluid = 18.18 * 10 ** (-6)
+        self.pfluid = 1.293
+        self.mewFluid = 18.25 * 10 ** (-6)
         self.Cd = 0.47
         self.windVel = windVel
         self.pMass = (4/3) * m.pi * ((self.dpart / 2) ** 2) * self.ppart
