@@ -17,7 +17,6 @@ class horizontalFilter:
         self.num2dot5PartOut = 0
         self.totalMass = 0
         
-
     def partIn(self, charge, diam, mass):
         self.totalCharge += charge
         if diam > 2.5 * 10 ** (-6):
@@ -45,31 +44,21 @@ class horizontalFilter:
         return self.num10PartOut + self.num2dot5PartOut
 
     def getVCD(self):
-        
         return self.volChargeDen
 
     def calcHowGood(self):
-        out2dot5 = 100 * (1 - self.num2dot5PartOut / self.num2dot5Part)
-        out10 = 100 * (1 - self.num10PartOut / self.num10Part)
-
-        out2dot5 = round(out2dot5, 2)
-        out10 = round(out10, 2)
-
+        if self.num2dot5PartOut != 0:
+            out2dot5 = 100 * (1 - self.num2dot5PartOut / self.num2dot5Part)
+            out2dot5 = round(out2dot5, 2)
+        else:
+            out2dot5 = "N/A"
+        if self.num10PartOut != 0:
+            out10 = 100 * (1 - self.num10PartOut / self.num10Part)
+            out10 = round(out10, 2)
+        else:
+            out10 = "N/A"
         return out2dot5, out10
-
-    def getHeight(self):
-        # obselete function?
-        return self.height
     
     def getDimensions(self):
         # access len w/ 0, height w/ 1, width w/ 2
         return [self.len, self.height, self.width]
-        
-        # if dim == 0:
-        #     return self.len
-        # elif dim == 1:
-        #     return self.height
-        # elif dim == 2:
-        #     return self.width
-        # else:
-        #     return 0
